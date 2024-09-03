@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Test3enc.props" />
+</Project>

@@ -1,0 +1,168 @@
+﻿@model Test3enc.Models.ViewModel.EncryptedFileViewModel
+@{
+    ViewData["Title"] = "File Encryption and Decryption";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .table {
+            margin-top: 20px;
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+            .table th, .table td {
+                text-align: center;
+            }
+
+        .alert {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+
+            .btn-primary:focus, .btn-primary.focus {
+                box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+            }
+
+        .header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .actions-button {
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>@ViewData["Title"]</h1>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form asp-action="Upload" enctype="multipart/form-data" method="post">
+            <div class="form-group">
+                <label for="file">File</label>
+                <input type="file" class="form-control-file" id="file" name="file" required />
+            </div>
+            <div class="form-group">
+                <label for="algorithm">Encryption Algorithm</label>
+                <select class="form-control" id="algorithm" name="algorithm" required>
+                    <option value="">Select an algorithm</option>
+                    <option value="AES">AES</option>
+                    <option value="RSA">RSA</option>
+                    <option value="TripleDES">Triple DES</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Encrypt and Upload</button>
+        </form>
+
+        <hr />
+
+        <h2>Encrypted Files</h2>
+
+        @if (Model.EncryptedFiles != null && Model.EncryptedFiles.Any())
+        {
+            <table id="encryptedFilesTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Encryption Algorithm</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var file in Model.EncryptedFiles)
+                    {
+                        <tr>
+                            <td>@file.FileName</td>
+                            <td>@file.EncryptionAlgorithm</td>
+                            <td>@file.UploadedAt.ToString("g")</td>
+                            <td>
+                                <button class="btn btn-primary actions-button" onclick="decryptAndDelete(@file.Id)">Decrypt and Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No files found.</p>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function decryptAndDelete(fileId) {
+            if (!confirm("Are you sure you want to decrypt and delete this file?")) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("DecryptAndDelete")',
+                type: 'POST',
+                data: { id: fileId },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        if (response.fileContent) {
+                            var blob = new Blob([Uint8Array.from(atob(response.fileContent), c => c.charCodeAt(0))], { type: "application/octet-stream" });
+                            var link = document.createElement('a');
+                            link.href = window.URL.createObjectURL(blob);
+                            link.download = response.fileName;
+                            link.click();
+                        }
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while processing your request.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
