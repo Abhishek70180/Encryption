@@ -9,8 +9,8 @@ namespace Test3enc.Services
 {
     public class TripleDesEncryptionService : ITripleDesEncryptionService
     {
-        private const int TripleDesKeySize = 192; // Key size in bits (24 bytes)
-        private const int TripleDesBlockSize = 64; // Block size in bits (8 bytes)
+        private const int TripleDesKeySize = 192;
+        private const int TripleDesBlockSize = 64;
 
         public async Task<EncryptedFile> EncryptFileAsync(IFormFile file, byte[] key)
         {
@@ -40,9 +40,9 @@ namespace Test3enc.Services
                         {
                             FileName = file.FileName,
                             EncryptedData = encryptedBytes,
-                            EncryptionKey = tripledes.Key, // Store the key
-                            EncryptionIv = tripledes.IV,  // Store the IV
-                            EncryptionAlgorithm = "TripleDES" // Indicate algorithm used
+                            EncryptionKey = tripledes.Key,
+                            EncryptionIv = tripledes.IV,
+                            EncryptionAlgorithm = "TripleDES"
                         };
                     }
                 }

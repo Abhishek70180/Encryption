@@ -15,18 +15,15 @@ namespace Test3enc.Controllers
         private readonly IAesEncryptionService _aesEncryptionService;       
         private readonly ITripleDesEncryptionService _tripleDesEncryptionService;
         private readonly IEncryptedFileService _encryptedFileService;
-        private readonly IKeyRepository _keyRepository;
 
         public HomeController(
             IAesEncryptionService aesEncryptionService,           
             ITripleDesEncryptionService tripleDesEncryptionService,
-            IEncryptedFileService encryptedFileService,
-            IKeyRepository keyRepository)
+            IEncryptedFileService encryptedFileService)
         {
             _aesEncryptionService = aesEncryptionService;
             _tripleDesEncryptionService = tripleDesEncryptionService;
             _encryptedFileService = encryptedFileService;
-            _keyRepository = keyRepository;
         }
 
         public async Task<IActionResult> Index()

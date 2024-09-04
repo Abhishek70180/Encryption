@@ -5,49 +5,54 @@
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/styles.css"> <!-- Link to your CSS file -->
+   
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="container mt-4">
+        <div class="text-center mb-4">
             <h1>@ViewData["Title"]</h1>
         </div>
 
         <!-- Loader element -->
-        <div id="loader" class="loader hidden"></div>
+        <div id="loader" class="loader d-none" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
 
-        <!-- Existing form and table -->
-        <form asp-action="Upload" enctype="multipart/form-data" method="post" id="uploadForm">
+        <!-- Form for file upload -->
+        <form asp-action="Upload" enctype="multipart/form-data" method="post" id="uploadForm" class="mb-4">
             <div class="form-group">
-                <label for="file">File</label>
-                <input type="file" class="form-control-file" id="file" name="file" required />
+                <label for="file" class="form-label">File</label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="file" name="file" required />
+                    <label class="custom-file-label" for="file">Choose file</label>
+                </div>
             </div>
             <div class="form-group">
                 <label for="algorithm">Encryption Algorithm</label>
-                <select class="form-control" id="algorithm" name="algorithm" required>
+                <select class="custom-select" id="algorithm" name="algorithm" required>
                     <option value="">Select an algorithm</option>
                     <option value="AES">AES</option>
-                    <option value="RSA">RSA</option>
                     <option value="TripleDES">Triple DES</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Encrypt and Upload</button>
+            <button type="submit" class="btn btn-primary btn-block">Encrypt and Upload</button>
         </form>
 
         <hr />
 
-        <h2>Encrypted Files</h2>
+        <h2 class="mb-3">Encrypted Files</h2>
 
         @if (Model.EncryptedFiles != null && Model.EncryptedFiles.Any())
         {
             <table id="encryptedFilesTable" class="table table-striped table-bordered">
-                <thead>
+                <thead class="thead-dark">
                     <tr>
                         <th>File Name</th>
                         <th>Encryption Algorithm</th>
@@ -63,7 +68,7 @@
                             <td>@file.EncryptionAlgorithm</td>
                             <td>@file.UploadedAt.ToString("g")</td>
                             <td>
-                                <button class="btn btn-primary actions-button" onclick="decryptAndDelete(@file.Id)">Decrypt and Delete</button>
+                                <button class="btn btn-danger btn-sm" onclick="decryptAndDelete(@file.Id)">Decrypt and Delete</button>
                             </td>
                         </tr>
                     }
@@ -79,12 +84,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Update the custom file input label to show the selected file name
+            $('.custom-file-input').on('change', function () {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+            });
+
             $("#uploadForm").on("submit", function () {
-                $("#loader").removeClass("hidden");
+                $("#loader").removeClass("d-none");
             });
 
             $(window).on("load", function () {
-                $("#loader").addClass("hidden");
+                $("#loader").addClass("d-none");
             });
         });
 
@@ -93,11 +104,17 @@
                 return;
             }
 
+            // Show loader when request starts
+            $("#loader").removeClass("d-none");
+
             $.ajax({
                 url: '@Url.Action("DecryptAndDelete")',
                 type: 'POST',
                 data: { id: fileId },
                 success: function (response) {
+                    // Hide loader after the request is successful
+                    $("#loader").addClass("d-none");
+
                     if (response.success) {
                         alert(response.message);
                         if (response.fileContent) {
@@ -113,6 +130,9 @@
                     }
                 },
                 error: function () {
+                    // Hide loader if there is an error
+                    $("#loader").addClass("d-none");
+
                     alert("An error occurred while processing your request.");
                 }
             });

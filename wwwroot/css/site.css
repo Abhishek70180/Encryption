@@ -54,3 +54,28 @@ body {
 .loader.hidden {
     display: none;
 }
+
+/* Custom file input styles */
+.custom-file-input:lang(en) ~ .custom-file-label::after {
+    content: "Browse";
+}
+
+.custom-file-input {
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+}
+
+.custom-file-label {
+    border-radius: 0.25rem;
+}
+
+/* Custom styles for the file upload button */
+.btn-block {
+    width: 100%;
+}
+
+/* Custom styles for table actions */
+.table .btn-sm {
+    margin: 0;
+}
