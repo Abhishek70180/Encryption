@@ -1,4 +1,5 @@
 ﻿@model Test3enc.Models.ViewModel.EncryptedFileViewModel
+@using System.Linq
 @{
     ViewData["Title"] = "File Encryption and Decryption";
 }
@@ -10,54 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .table {
-            margin-top: 20px;
-            border-radius: 0.25rem;
-            overflow: hidden;
-        }
-
-            .table th, .table td {
-                text-align: center;
-            }
-
-        .alert {
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-
-            .btn-primary:hover {
-                background-color: #0056b3;
-                border-color: #004085;
-            }
-
-            .btn-primary:focus, .btn-primary.focus {
-                box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-            }
-
-        .header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .actions-button {
-            min-width: 120px;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/styles.css"> <!-- Link to your CSS file -->
 </head>
 <body>
     <div class="container">
@@ -65,21 +19,11 @@
             <h1>@ViewData["Title"]</h1>
         </div>
 
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="alert alert-danger">
-                @TempData["ErrorMessage"]
-            </div>
-        }
+        <!-- Loader element -->
+        <div id="loader" class="loader hidden"></div>
 
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success">
-                @TempData["SuccessMessage"]
-            </div>
-        }
-
-        <form asp-action="Upload" enctype="multipart/form-data" method="post">
+        <!-- Existing form and table -->
+        <form asp-action="Upload" enctype="multipart/form-data" method="post" id="uploadForm">
             <div class="form-group">
                 <label for="file">File</label>
                 <input type="file" class="form-control-file" id="file" name="file" required />
@@ -134,6 +78,16 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        $(document).ready(function () {
+            $("#uploadForm").on("submit", function () {
+                $("#loader").removeClass("hidden");
+            });
+
+            $(window).on("load", function () {
+                $("#loader").addClass("hidden");
+            });
+        });
+
         function decryptAndDelete(fileId) {
             if (!confirm("Are you sure you want to decrypt and delete this file?")) {
                 return;

@@ -1,22 +1,56 @@
+/* Base font size */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
+/* Font size adjustment for larger screens */
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
+/* Focus and active states for buttons and form controls */
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* Ensure the html takes the full height of the viewport */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
+/* Provide space at the bottom of the page */
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+/* Loader styles */
+.loader {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    z-index: 1050; /* Ensure loader is on top */
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader.hidden {
+    display: none;
 }

@@ -9,6 +9,7 @@
         public byte[] IV { get; set; }
         public byte[] EncryptionIv { get; set; }
         public byte[] EncryptionKey { get; set; }
+        public byte[] EncryptedKey { get; set; }
         public DateTime UploadedAt { get; set; }
     }
 }

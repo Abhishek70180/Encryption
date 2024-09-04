@@ -1,32 +1,29 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Test3enc.Models;
 using Test3enc.Services.IServices;
 using Test3enc.Models.ViewModel;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Test3enc.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IAesEncryptionService _aesEncryptionService;
-        private readonly IRsaEncryptionService _rsaEncryptionService;
+        private readonly IAesEncryptionService _aesEncryptionService;       
         private readonly ITripleDesEncryptionService _tripleDesEncryptionService;
         private readonly IEncryptedFileService _encryptedFileService;
         private readonly IKeyRepository _keyRepository;
 
         public HomeController(
-            IAesEncryptionService aesEncryptionService,
-            IRsaEncryptionService rsaEncryptionService,
+            IAesEncryptionService aesEncryptionService,           
             ITripleDesEncryptionService tripleDesEncryptionService,
             IEncryptedFileService encryptedFileService,
             IKeyRepository keyRepository)
         {
             _aesEncryptionService = aesEncryptionService;
-            _rsaEncryptionService = rsaEncryptionService;
             _tripleDesEncryptionService = tripleDesEncryptionService;
             _encryptedFileService = encryptedFileService;
             _keyRepository = keyRepository;
@@ -50,7 +47,6 @@ namespace Test3enc.Controllers
                 return RedirectToAction("Index");
             }
 
-            byte[] key;
             EncryptedFile encryptedFile;
 
             try
@@ -58,16 +54,12 @@ namespace Test3enc.Controllers
                 switch (algorithm)
                 {
                     case "AES":
-                        key = GenerateAesKey();
-                        encryptedFile = await _aesEncryptionService.EncryptFileAsync(file, key);
-                        break;
-                    case "RSA":
-                        (key, _) = GenerateRsaKeyPair();
-                        encryptedFile = await _rsaEncryptionService.EncryptFileAsync(file, key);
+                        var aesKey = GenerateAesKey();
+                        encryptedFile = await _aesEncryptionService.EncryptFileAsync(file, aesKey);
                         break;
                     case "TripleDES":
-                        key = GenerateTripleDesKey();
-                        encryptedFile = await _tripleDesEncryptionService.EncryptFileAsync(file, key);
+                        var tripleDesKey = GenerateTripleDesKey();
+                        encryptedFile = await _tripleDesEncryptionService.EncryptFileAsync(file, tripleDesKey);
                         break;
                     default:
                         throw new ArgumentException("Invalid encryption algorithm");
@@ -102,10 +94,8 @@ namespace Test3enc.Controllers
                 {
                     case "AES":
                         decryptedData = await _aesEncryptionService.DecryptFileAsync(encryptedFile);
-                        break;
-                    case "RSA":                      
-                        decryptedData = await _rsaEncryptionService.DecryptFileAsync(encryptedFile);
-                        break;
+                        break;                 
+
                     case "TripleDES":
                         decryptedData = await _tripleDesEncryptionService.DecryptFileAsync(encryptedFile);
                         break;
@@ -126,7 +116,6 @@ namespace Test3enc.Controllers
             }
         }
 
-
         private byte[] GenerateAesKey()
         {
             using (var aes = Aes.Create())
@@ -134,17 +123,6 @@ namespace Test3enc.Controllers
                 aes.KeySize = 256;
                 aes.GenerateKey();
                 return aes.Key;
-            }
-        }
-
-        private (byte[] publicKey, byte[] privateKey) GenerateRsaKeyPair()
-        {
-            using (var rsa = RSA.Create())
-            {
-                rsa.KeySize = 2048;
-                var publicKey = rsa.ExportRSAPublicKey();
-                var privateKey = rsa.ExportRSAPrivateKey();
-                return (publicKey, privateKey);
             }
         }
 
@@ -157,15 +135,5 @@ namespace Test3enc.Controllers
                 return tripleDes.Key;
             }
         }
-        private async Task<byte[]> LoadRsaPrivateKeyAsync()
-        {
-            var privateKeyBase64 = await _keyRepository.GetRsaPrivateKeyAsync();
-            if (string.IsNullOrEmpty(privateKeyBase64))
-            {
-                throw new InvalidOperationException("RSA private key is not available.");
-            }
-            return Convert.FromBase64String(privateKeyBase64);
-        }
     }
 }
-

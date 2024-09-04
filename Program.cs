@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Test3enc;
 using Test3enc.Data;
 using Test3enc.Services;
 using Test3enc.Services.IServices;
@@ -16,7 +17,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAesEncryptionService, AesEncryptionService>();
-builder.Services.AddScoped<IRsaEncryptionService, RsaEncryptionService>();
 builder.Services.AddScoped<ITripleDesEncryptionService, TripleDesEncryptionService>();
 builder.Services.AddScoped<IEncryptionKeyService, EncryptionKeyService>();
 builder.Services.AddScoped<IEncryptedFileService, EncryptedFileService>();
