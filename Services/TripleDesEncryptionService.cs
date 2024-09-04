@@ -31,7 +31,7 @@ namespace Test3enc.Services
                     tripledes.Mode = CipherMode.CBC;
                     tripledes.Padding = PaddingMode.PKCS7;
                     tripledes.Key = key;
-                    tripledes.GenerateIV(); // Generate a new IV for each encryption
+                    tripledes.GenerateIV();
 
                     using (var encryptor = tripledes.CreateEncryptor(tripledes.Key, tripledes.IV))
                     {
