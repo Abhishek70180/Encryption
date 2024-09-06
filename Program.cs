@@ -20,6 +20,7 @@ builder.Services.AddScoped<IAesEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<ITripleDesEncryptionService, TripleDesEncryptionService>();
 builder.Services.AddScoped<IEncryptionKeyService, EncryptionKeyService>();
 builder.Services.AddScoped<IEncryptedFileService, EncryptedFileService>();
+builder.Services.AddScoped<IRsaEncryptionService,RsaEncryptionService>();
 
 var app = builder.Build();
 

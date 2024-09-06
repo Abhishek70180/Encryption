@@ -1,28 +1,31 @@
 using System;
 using System.IO;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Test3enc.Models;
 using Test3enc.Services.IServices;
 using Test3enc.Models.ViewModel;
+using System.Security.Cryptography;
 
 namespace Test3enc.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IAesEncryptionService _aesEncryptionService;       
+        private readonly IAesEncryptionService _aesEncryptionService;
         private readonly ITripleDesEncryptionService _tripleDesEncryptionService;
+        private readonly IRsaEncryptionService _rsaEncryptionService; // Added RSA service
         private readonly IEncryptedFileService _encryptedFileService;
 
         public HomeController(
-            IAesEncryptionService aesEncryptionService,           
+            IAesEncryptionService aesEncryptionService,
             ITripleDesEncryptionService tripleDesEncryptionService,
+            IRsaEncryptionService rsaEncryptionService,
             IEncryptedFileService encryptedFileService)
         {
             _aesEncryptionService = aesEncryptionService;
             _tripleDesEncryptionService = tripleDesEncryptionService;
+            _rsaEncryptionService = rsaEncryptionService;
             _encryptedFileService = encryptedFileService;
         }
 
@@ -58,9 +61,15 @@ namespace Test3enc.Controllers
                         var tripleDesKey = GenerateTripleDesKey();
                         encryptedFile = await _tripleDesEncryptionService.EncryptFileAsync(file, tripleDesKey);
                         break;
+                    case "RSA":
+                        var rsaKeys = _rsaEncryptionService.GenerateRsaKeyPair();
+                        encryptedFile = await _rsaEncryptionService.EncryptFileAsync(file, rsaKeys.PublicKey);
+                        encryptedFile.PrivateKey = rsaKeys.PrivateKey;
+                        break;
                     default:
                         throw new ArgumentException("Invalid encryption algorithm");
                 }
+
                 encryptedFile.UploadedAt = DateTime.UtcNow;
                 encryptedFile.EncryptionAlgorithm = algorithm;
                 await _encryptedFileService.SaveEncryptedFileAsync(encryptedFile);
@@ -91,20 +100,19 @@ namespace Test3enc.Controllers
                 {
                     case "AES":
                         decryptedData = await _aesEncryptionService.DecryptFileAsync(encryptedFile);
-                        break;                 
-
+                        break;
                     case "TripleDES":
                         decryptedData = await _tripleDesEncryptionService.DecryptFileAsync(encryptedFile);
+                        break;
+                    case "RSA":
+                        decryptedData = await _rsaEncryptionService.DecryptFileAsync(encryptedFile, encryptedFile.PrivateKey); // Decrypt with RSA
                         break;
                     default:
                         throw new ArgumentException("Invalid encryption algorithm");
                 }
 
                 await _encryptedFileService.DeleteEncryptedFileAsync(id);
-
                 string base64String = Convert.ToBase64String(decryptedData);
-
-                // Return the file as a Base64 string
                 return Json(new { success = true, message = "File decrypted and deleted successfully.", fileName = encryptedFile.FileName, fileContent = base64String });
             }
             catch (Exception ex)

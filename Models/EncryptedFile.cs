@@ -11,5 +11,6 @@
         public byte[] EncryptionKey { get; set; }
         public byte[] EncryptedKey { get; set; }
         public DateTime UploadedAt { get; set; }
+        public string PrivateKey { get; internal set; }
     }
 }

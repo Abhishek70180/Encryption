@@ -12,7 +12,6 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="~/css/styles.css"> <!-- Link to your CSS file -->
-   
 </head>
 <body>
     <div class="container mt-4">
@@ -20,12 +19,10 @@
             <h1>@ViewData["Title"]</h1>
         </div>
 
-        <!-- Loader element -->
         <div id="loader" class="loader d-none" role="status">
             <span class="sr-only">Loading...</span>
         </div>
 
-        <!-- Form for file upload -->
         <form asp-action="Upload" enctype="multipart/form-data" method="post" id="uploadForm" class="mb-4">
             <div class="form-group">
                 <label for="file" class="form-label">File</label>
@@ -40,6 +37,7 @@
                     <option value="">Select an algorithm</option>
                     <option value="AES">AES</option>
                     <option value="TripleDES">Triple DES</option>
+                    <option value="RSA">RSA</option> <!-- Added RSA -->
                 </select>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Encrypt and Upload</button>
@@ -103,8 +101,6 @@
             if (!confirm("Are you sure you want to decrypt and delete this file?")) {
                 return;
             }
-
-            // Show loader when request starts
             $("#loader").removeClass("d-none");
 
             $.ajax({
@@ -130,7 +126,6 @@
                     }
                 },
                 error: function () {
-                    // Hide loader if there is an error
                     $("#loader").addClass("d-none");
 
                     alert("An error occurred while processing your request.");
