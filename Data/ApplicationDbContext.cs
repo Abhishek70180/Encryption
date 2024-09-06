@@ -11,7 +11,6 @@ namespace Test3enc.Data
         {
         }
         public DbSet<EncryptedFile> EncryptedFiles { get; set; }
-        public DbSet<EncryptionKey> EncryptionKeys { get; set; }    
-        public DbSet<KeyRecord> Keys { get; set; }
+        public DbSet<EncryptionKey> EncryptionKeys { get; set; }  
     }
 }

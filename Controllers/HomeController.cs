@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Test3enc.Models;
 using Test3enc.Services.IServices;
 using Test3enc.Models.ViewModel;
@@ -14,7 +14,7 @@ namespace Test3enc.Controllers
     {
         private readonly IAesEncryptionService _aesEncryptionService;
         private readonly ITripleDesEncryptionService _tripleDesEncryptionService;
-        private readonly IRsaEncryptionService _rsaEncryptionService; // Added RSA service
+        private readonly IRsaEncryptionService _rsaEncryptionService;
         private readonly IEncryptedFileService _encryptedFileService;
 
         public HomeController(
@@ -43,7 +43,7 @@ namespace Test3enc.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                ModelState.AddModelError("", "Please select a file to upload.");
+                TempData["ErrorMessage"] = "Please select a file to upload.";
                 return RedirectToAction("Index");
             }
 
@@ -105,7 +105,7 @@ namespace Test3enc.Controllers
                         decryptedData = await _tripleDesEncryptionService.DecryptFileAsync(encryptedFile);
                         break;
                     case "RSA":
-                        decryptedData = await _rsaEncryptionService.DecryptFileAsync(encryptedFile, encryptedFile.PrivateKey); // Decrypt with RSA
+                        decryptedData = await _rsaEncryptionService.DecryptFileAsync(encryptedFile, encryptedFile.PrivateKey);
                         break;
                     default:
                         throw new ArgumentException("Invalid encryption algorithm");

@@ -1,8 +1,11 @@
-﻿namespace Test3enc.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Test3enc.Models
 {
     public class EncryptedFile
     {
         public int Id { get; set; }
+        [Required]
         public string FileName { get; set; }
         public byte[] EncryptedData { get; set; }
         public string EncryptionAlgorithm { get; set; }

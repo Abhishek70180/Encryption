@@ -18,7 +18,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IAesEncryptionService, AesEncryptionService>();
 builder.Services.AddScoped<ITripleDesEncryptionService, TripleDesEncryptionService>();
-builder.Services.AddScoped<IEncryptionKeyService, EncryptionKeyService>();
 builder.Services.AddScoped<IEncryptedFileService, EncryptedFileService>();
 builder.Services.AddScoped<IRsaEncryptionService,RsaEncryptionService>();
 
